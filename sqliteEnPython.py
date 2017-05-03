@@ -1,0 +1,3 @@
+import inicio
+
+inicio.menuInicio()
