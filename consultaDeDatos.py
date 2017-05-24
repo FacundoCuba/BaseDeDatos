@@ -1,4 +1,5 @@
 import sqlite3
+import inicio
 
 base = sqlite3.connect('D:\pi.db')
 c = base.cursor()
@@ -8,7 +9,7 @@ def consulta():
     print("1 para ver la lista de Fabricantes")
     print("2 para ver la lista de Articulos")
     print("3 para ver la lista completa")
-    print("4 para Salir")
+    print("4 para el Menu de Inicio")
     inputDeConsulta = input()
     if inputDeConsulta == "1":
         c.execute('SELECT * FROM FABRICANTES')
@@ -29,9 +30,7 @@ def consulta():
         for i in a:
             print(i[0], i[1], i[2], i[3])
     elif inputDeConsulta == "4":
-        print("Saliendo...")
-        print("")
-        exit()
+        inicio.menuInicio()
     else:
         print("Ingrese una opcion valida!")
         consulta()
