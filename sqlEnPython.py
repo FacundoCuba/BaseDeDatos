@@ -1,18 +1,20 @@
-import cargaDeDatos
-import consultaDeDatos
+import sqlite3
+
+base = sqlite3.connect('D:\pi.db')
+c = base.cursor()
 
 def menuInicio():
     print("Base de Datos de Productos Informaticos")
     print("Ingrese una opcion para continuar...")
-    print("1 para Cargar Datos")
-    print("2 para Realizar Consultas")
+    print("1 para Realizar Consultas")
+    print("2 para Cargar Datos")
     print("3 para Salir")
     inputDelUser = input()
     print("")
     if inputDelUser == "1":
-        cargaDeDatos.carga()
+        consulta()
     elif inputDelUser == "2":
-        consultaDeDatos.consulta()
+        carga()
     elif inputDelUser == "3":
         print("Saliendo...")
         print("")
@@ -22,13 +24,7 @@ def menuInicio():
         print("")
         menuInicio()
 
-######################################################################
-import sqlite3
-import inicio
-
-base = sqlite3.connect('D:\pi.db')
-c = base.cursor()
-
+###################CONSULTA################################
 def consulta():
     print("Ingrese una opcion para continuar...")
     print("1 para ver la lista de Fabricantes")
@@ -55,19 +51,12 @@ def consulta():
         for i in a:
             print(i[0], i[1], i[2], i[3])
     elif inputDeConsulta == "4":
-        inicio.menuInicio()
+        menuInicio()
     else:
         print("Ingrese una opcion valida!")
         consulta()
 
-
-##################################################3
-import sqlite3
-import inicio
-
-base = sqlite3.connect('D:\pi.db')
-c = base.cursor()
-
+###################CARGA################################
 def carga():
     print("Ingrese una opcion para continuar...")
     print("1 para Cargar Fabricantes")
@@ -75,27 +64,34 @@ def carga():
     print("3 para Menu de Inicio")
     inputDeCarga = input()
     if inputDeCarga == "1":
-        nombreFabricante = input("Ingrese Nombre del Fabricante: ")
+        nombreFabricante = input("Ingrese Nombre del Fabricante: ").upper()
         c.execute('INSERT INTO FABRICANTES(NOMBRE) VALUES ("{}");'.format(nombreFabricante))
-        a = c.fetchall()
+        base.commit()
         carga()
     elif inputDeCarga == "2":
-        nombreArticulo = input("Ingrese Nombre del Articulo: ")
-        precio = input("Ingrese el Precio: ")
-        fabricante = input("Ingrese Nombre del Fabricante: ")
-        try:
-            c.execute('SELECT "{}" FROM FABRICANTES;'.format(fabricante))
-            a = c.fetchall()
-            if not a:
-                c.execute('INSERT INTO FABRICACANTES(NOMBRE) VALUES ("{}");'.format(fabricante))
-                b = c.fetchall()
-        c.execute('INSERT INTO ARTICULOS(NOMBRE,PRECIO,FAB) VALUES ("{}",{},(SELECT ID FROM FABRICANTES WHERE (NOMBRE = "{}")));'.format(nombreArticulo, precio, fabricante))
-        d = c.fetchall()
+        nombreArticulo = input("Ingrese Nombre del Articulo: ").upper()
+        precio = input("Ingrese el Precio: ").upper()
+        fabricante = input("Ingrese Nombre del Fabricante: ").upper()
+        listaDeFabricantes = []
+        c.execute('SElECT NOMBRE FROM FABRICANTES')
+        a = c.fetchall()
+        for i in a:
+            listaDeFabricantes.append(a)
+        if fabricante in listaDeFabricantes:
+            c.execute('INSERT INTO ARTICULOS(NOMBRE,PRECIO,FAB) VALUES ("{}",{},(SELECT ID FROM FABRICANTES WHERE (NOMBRE = "{}")));'.format(nombreArticulo, precio, fabricante))
+            base.commit()
+        else:
+            c.execute('INSERT INTO FABRICANTES(NOMBRE) VALUES ("{}");'.format(fabricante))
+            c.execute('INSERT INTO ARTICULOS(NOMBRE,PRECIO,FAB) VALUES ("{}",{},(SELECT ID FROM FABRICANTES WHERE (NOMBRE = "{}")));'.format(nombreArticulo, precio, fabricante))
+            base.commit()
         carga()
     elif inputDeCarga == "3":
-        inicio.menuInicio()
+        menuInicio()
     else:
         print("Ingrese una opcion valida!")
         carga()
 
 
+menuInicio()
+carga()
+consulta()
