@@ -19,6 +19,12 @@ def menuInicio():
         print("Saliendo...")
         print("")
         exit()
+    #SECUENCIA#SQL#POR#CONSOLA#DE#PYTHON#
+    elif inputDelUser == "4":
+        c.execute(input())
+        a = c.fetchall()
+        print(a)
+        menuInicio()
     else:
         print("Ingrese una opcion valida!")
         print("")
@@ -61,7 +67,9 @@ def carga():
     print("Ingrese una opcion para continuar...")
     print("1 para Cargar Fabricantes")
     print("2 para Cargar Articulos")
-    print("3 para Menu de Inicio")
+    print("3 para Cargar Clientes")
+    print("4 para Cargar Facturas")
+    print("5 para Menu de Inicio")
     inputDeCarga = input()
     if inputDeCarga == "1":
         nombreFabricante = input("Ingrese Nombre del Fabricante: ").upper()
@@ -86,11 +94,41 @@ def carga():
             base.commit()
         carga()
     elif inputDeCarga == "3":
+        nombreCliente = input("Ingrese Nombre del Cliente: ").upper()
+        apellidoCliente = input("Ingrese Apellido del Cliente: ").upper()
+        cuilCuit = input("Ingrese CUIL/CUIT del Cliente: ")
+        c.execute('INSERT INTO CLIENTES(NOMBRE,APELLIDO,CUIL_CUIT) VALUES ("{}","{}",{});'.format(nombreCliente,apellidoCliente,cuilCuit))
+        base.commit()
+        carga()
+    elif inputDeCarga == "4":
+        #TODO Alta de FACTURAS (encabezado).
+        fecha = int(input("Ingrese la fecha (ddmmaaaa): "))
+        cuilCuit = input("Ingrese CUIL/CUIT del Cliente: ")
+        listaDeCuilCuit = []
+        c.execute('SElECT CUIL_CUIT FROM CLIENTES')
+        a = c.fetchall()
+        #for i in a:
+        listaDeCuilCuit.append(a)
+        print(listaDeCuilCuit)
+        if cuilCuit in listaDeCuilCuit and 9999999999<cuilCuit<100000000000:
+            c.execute('INSERT INTO FACTURAS(FECHA,ID_CLI) VALUES ({},(SELECT ID FROM CLIENTES WHERE (CUIL_CUIT = {})));'.format(fecha,cuilCuit))
+            base.commit()
+        else:
+            nombreCliente = input("Ingrese Nombre del Cliente: ").upper()
+            apellidoCliente = input("Ingrese Apellido del Cliente: ").upper()
+            c.execute('INSERT INTO CLIENTES(NOMBRE,APELLIDO,CUIL_CUIT) VALUES ("{}","{}",{});'.format(nombreCliente,apellidoCliente,cuilCuit))
+            c.execute('INSERT INTO FACTURAS(FECHA,ID_CLI) VALUES ({},(SELECT ID FROM CLIENTES WHERE (CUIL_CUIT = {})));'.format(fecha,cuilCuit))
+            base.commit()
+        carga()
+    elif inputDeCarga == "5":
         menuInicio()
     else:
         print("Ingrese una opcion valida!")
         carga()
 
+##########FACTURACION#########
+#TODO crear el detalle de la factura.
+#TODO juntar encabezado y detalle, e imprimirlos.
 
 menuInicio()
 carga()
