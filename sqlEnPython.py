@@ -128,13 +128,15 @@ def carga():
         carga()
 
 ##########FACTURACION#########
-def facturacion():
-
-
-
-
-
-
+'''def facturacion():
+    articulo = input("Ingrese Nombre del Articulo: ").upper()
+    fabricante = input("Ingrese el Nombre del Articulo").upper()
+    cliente = input("Ingrese CUIL/CUIT del Cliente: ").upper()
+    cantidad = int(input("Ingrese la cantidad: "))
+    precio = c.execute('SELECT ARTICULOS.PRECIO FROM ARTICULOS WHERE (ARTICULOS.NOMBRE = "{}" AND FABRICANTES.NOMBRE = "{}");'.format(articulo,fabricante))
+    c.execute('INSERT INTO ART_FAC(CANTIDAD,PRECIO) VALUES ({},{},{},{});'.format(cantidad,precio))
+    base.commit()
+'''
 
 
 #TODO juntar encabezado y detalle, e imprimirlos.
@@ -142,4 +144,4 @@ def facturacion():
 menuInicio()
 carga()
 consulta()
-facturacion()
+#facturacion()
