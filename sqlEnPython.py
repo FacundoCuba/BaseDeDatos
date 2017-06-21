@@ -8,7 +8,8 @@ def menuInicio():
     print("Ingrese una opcion para continuar...")
     print("1 para Realizar Consultas")
     print("2 para Cargar Datos")
-    print("3 para Salir")
+    print("3 para Facturacion")
+    print("4 para Salir")
     inputDelUser = input()
     print("")
     if inputDelUser == "1":
@@ -16,11 +17,13 @@ def menuInicio():
     elif inputDelUser == "2":
         carga()
     elif inputDelUser == "3":
+        facturacion()
+    elif inputDelUser == "4":
         print("Saliendo...")
         print("")
         exit()
     #SECUENCIA#SQL#POR#CONSOLA#DE#PYTHON#
-    elif inputDelUser == "4":
+    elif inputDelUser == "5":
         c.execute(input())
         a = c.fetchall()
         print(a)
@@ -84,7 +87,7 @@ def carga():
         c.execute('SElECT NOMBRE FROM FABRICANTES')
         a = c.fetchall()
         for i in a:
-            listaDeFabricantes.append(a)
+            listaDeFabricantes.append(i[0])
         if fabricante in listaDeFabricantes:
             c.execute('INSERT INTO ARTICULOS(NOMBRE,PRECIO,FAB) VALUES ("{}",{},(SELECT ID FROM FABRICANTES WHERE (NOMBRE = "{}")));'.format(nombreArticulo, precio, fabricante))
             base.commit()
@@ -96,21 +99,19 @@ def carga():
     elif inputDeCarga == "3":
         nombreCliente = input("Ingrese Nombre del Cliente: ").upper()
         apellidoCliente = input("Ingrese Apellido del Cliente: ").upper()
-        cuilCuit = input("Ingrese CUIL/CUIT del Cliente: ")
+        cuilCuit = int(input("Ingrese CUIL/CUIT del Cliente: "))
         c.execute('INSERT INTO CLIENTES(NOMBRE,APELLIDO,CUIL_CUIT) VALUES ("{}","{}",{});'.format(nombreCliente,apellidoCliente,cuilCuit))
         base.commit()
         carga()
     elif inputDeCarga == "4":
-        #TODO Alta de FACTURAS (encabezado).
         fecha = int(input("Ingrese la fecha (ddmmaaaa): "))
-        cuilCuit = input("Ingrese CUIL/CUIT del Cliente: ")
+        cuilCuit = int(input("Ingrese CUIL/CUIT del Cliente: "))
         listaDeCuilCuit = []
         c.execute('SElECT CUIL_CUIT FROM CLIENTES')
         a = c.fetchall()
-        #for i in a:
-        listaDeCuilCuit.append(a)
-        print(listaDeCuilCuit)
-        if cuilCuit in listaDeCuilCuit and 9999999999<cuilCuit<100000000000:
+        for i in a:
+            listaDeCuilCuit.append(i[0])
+        if cuilCuit in listaDeCuilCuit:
             c.execute('INSERT INTO FACTURAS(FECHA,ID_CLI) VALUES ({},(SELECT ID FROM CLIENTES WHERE (CUIL_CUIT = {})));'.format(fecha,cuilCuit))
             base.commit()
         else:
@@ -127,9 +128,18 @@ def carga():
         carga()
 
 ##########FACTURACION#########
-#TODO crear el detalle de la factura.
+def facturacion():
+
+
+
+
+
+
+
+
 #TODO juntar encabezado y detalle, e imprimirlos.
 
 menuInicio()
 carga()
 consulta()
+facturacion()
