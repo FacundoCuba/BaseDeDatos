@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import date
 
 base = sqlite3.connect('D:\pi.db')
 c = base.cursor()
@@ -7,9 +8,8 @@ def menuInicio():
     print("Base de Datos de Productos Informaticos")
     print("Ingrese una opcion para continuar...")
     print("1 para Realizar Consultas")
-    print("2 para Cargar Datos")
-    print("3 para Facturacion")
-    print("4 para Salir")
+    print("2 para Cargar Datos y Facturacion")
+    print("3 para Salir")
     inputDelUser = input()
     print("")
     if inputDelUser == "1":
@@ -17,13 +17,11 @@ def menuInicio():
     elif inputDelUser == "2":
         carga()
     elif inputDelUser == "3":
-        facturacion()
-    elif inputDelUser == "4":
         print("Saliendo...")
         print("")
         exit()
     #SECUENCIA#SQL#POR#CONSOLA#DE#PYTHON#
-    elif inputDelUser == "5":
+    elif inputDelUser == "4":
         c.execute(input())
         a = c.fetchall()
         print(a)
@@ -35,6 +33,7 @@ def menuInicio():
 
 ###################CONSULTA################################
 def consulta():
+    print("")
     print("Ingrese una opcion para continuar...")
     print("1 para ver la lista de Fabricantes")
     print("2 para ver la lista de Articulos")
@@ -66,20 +65,38 @@ def consulta():
         consulta()
 
 ###################CARGA################################
+def detalle():
+    idArticulo = input("Ingrese el Articulo deseado: ")
+    cantidad = input("Ingrese la cantidad: ")
+    c.execute('INSERT INTO ART_FAC (ID_ART, ID_FAC, PRECIO, CANTIDAD) VALUES ({}, (SELECT MAX(ID) FROM FACTURAS),(SELECT PRECIO FROM ARTICULOS WHERE ID = {}), {});'.format(idArticulo, idArticulo, cantidad))
+    print("Desea cargar mas articulos?")
+    print("1 para continuar")
+    print("2 para salir")
+    inputDeRespuesta = input()
+    if inputDeRespuesta == "1":
+        detalle()
+    elif inputDeRespuesta == "2":
+        base.commit()
+    else:
+        print("Ingrese una opcion validad...")
+        detalle()
+
 def carga():
     print("Ingrese una opcion para continuar...")
     print("1 para Cargar Fabricantes")
     print("2 para Cargar Articulos")
     print("3 para Cargar Clientes")
-    print("4 para Cargar Facturas")
+    print("4 para Generar Facturas")
     print("5 para Menu de Inicio")
     inputDeCarga = input()
     if inputDeCarga == "1":
+        print("")
         nombreFabricante = input("Ingrese Nombre del Fabricante: ").upper()
         c.execute('INSERT INTO FABRICANTES(NOMBRE) VALUES ("{}");'.format(nombreFabricante))
         base.commit()
         carga()
     elif inputDeCarga == "2":
+        print("")
         nombreArticulo = input("Ingrese Nombre del Articulo: ").upper()
         precio = input("Ingrese el Precio: ").upper()
         fabricante = input("Ingrese Nombre del Fabricante: ").upper()
@@ -97,6 +114,7 @@ def carga():
             base.commit()
         carga()
     elif inputDeCarga == "3":
+        print("")
         nombreCliente = input("Ingrese Nombre del Cliente: ").upper()
         apellidoCliente = input("Ingrese Apellido del Cliente: ").upper()
         cuilCuit = int(input("Ingrese CUIL/CUIT del Cliente: "))
@@ -104,7 +122,8 @@ def carga():
         base.commit()
         carga()
     elif inputDeCarga == "4":
-        fecha = int(input("Ingrese la fecha (ddmmaaaa): "))
+        print("")
+        fecha = date.today().strftime("%d/%m/%Y")
         cuilCuit = int(input("Ingrese CUIL/CUIT del Cliente: "))
         listaDeCuilCuit = []
         c.execute('SElECT CUIL_CUIT FROM CLIENTES')
@@ -112,14 +131,16 @@ def carga():
         for i in a:
             listaDeCuilCuit.append(i[0])
         if cuilCuit in listaDeCuilCuit:
-            c.execute('INSERT INTO FACTURAS(FECHA,ID_CLI) VALUES ({},(SELECT ID FROM CLIENTES WHERE (CUIL_CUIT = {})));'.format(fecha,cuilCuit))
+            c.execute('INSERT INTO FACTURAS(FECHA,ID_CLI) VALUES ("{}",(SELECT ID FROM CLIENTES WHERE (CUIL_CUIT = {})));'.format(fecha,cuilCuit))
             base.commit()
+            detalle()
         else:
             nombreCliente = input("Ingrese Nombre del Cliente: ").upper()
             apellidoCliente = input("Ingrese Apellido del Cliente: ").upper()
             c.execute('INSERT INTO CLIENTES(NOMBRE,APELLIDO,CUIL_CUIT) VALUES ("{}","{}",{});'.format(nombreCliente,apellidoCliente,cuilCuit))
-            c.execute('INSERT INTO FACTURAS(FECHA,ID_CLI) VALUES ({},(SELECT ID FROM CLIENTES WHERE (CUIL_CUIT = {})));'.format(fecha,cuilCuit))
+            c.execute('INSERT INTO FACTURAS(FECHA,ID_CLI) VALUES ("{}",(SELECT ID FROM CLIENTES WHERE (CUIL_CUIT = {})));'.format(fecha,cuilCuit))
             base.commit()
+            detalle()
         carga()
     elif inputDeCarga == "5":
         menuInicio()
@@ -127,21 +148,7 @@ def carga():
         print("Ingrese una opcion valida!")
         carga()
 
-##########FACTURACION#########
-'''def facturacion():
-    articulo = input("Ingrese Nombre del Articulo: ").upper()
-    fabricante = input("Ingrese el Nombre del Articulo").upper()
-    cliente = input("Ingrese CUIL/CUIT del Cliente: ").upper()
-    cantidad = int(input("Ingrese la cantidad: "))
-    precio = c.execute('SELECT ARTICULOS.PRECIO FROM ARTICULOS WHERE (ARTICULOS.NOMBRE = "{}" AND FABRICANTES.NOMBRE = "{}");'.format(articulo,fabricante))
-    c.execute('INSERT INTO ART_FAC(CANTIDAD,PRECIO) VALUES ({},{},{},{});'.format(cantidad,precio))
-    base.commit()
-'''
-
-
-#TODO juntar encabezado y detalle, e imprimirlos.
-
 menuInicio()
 carga()
 consulta()
-#facturacion()
+detalle()
